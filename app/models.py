@@ -12,6 +12,7 @@ class TransactionType(str, Enum):
     DIVIDEND = "DIVIDEND"
     TRANSFER_IN = "TRANSFER_IN"
     TRANSFER_OUT = "TRANSFER_OUT"
+    MANUAL_OPENING_POSITION = "MANUAL_OPENING_POSITION"
 
 
 @dataclass(frozen=True)

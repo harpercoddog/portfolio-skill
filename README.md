@@ -110,6 +110,24 @@ python scripts/init_db.py
 python scripts/init_db.py --db-path data/portfolio.db
 ```
 
+### 从现有 Stock & Finance 数据库导入
+
+如果你已经在同一工作区的 `backend/portfolio.db` 里维护了账户和持仓，可以直接导入：
+
+```bash
+python scripts/import_backend_data.py
+python scripts/import_backend_data.py --source-db ../backend/portfolio.db --db-path data/portfolio.db
+```
+
+导入内容包括：
+
+- 账户
+- 标的
+- 交易流水
+- 价格历史
+
+导入是幂等的，重复执行会自动跳过已存在的同一笔交易。
+
 ### 记录交易
 
 ```bash

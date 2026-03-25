@@ -30,7 +30,7 @@ def _apply_transaction(state: PositionState, row: sqlite3.Row) -> PositionState:
     gross_amount = to_decimal(row["gross_amount"])
     fee = to_decimal(row["fee"])
 
-    if tx_type == TransactionType.BUY:
+    if tx_type in {TransactionType.BUY, TransactionType.MANUAL_OPENING_POSITION}:
         new_total_cost = state.quantity * state.average_cost + gross_amount + fee
         new_quantity = state.quantity + quantity
         state.quantity = quant_qty(new_quantity)
@@ -216,4 +216,3 @@ def summarize_by_account(positions: list[dict]) -> list[dict]:
         }
         for account_name, payload in sorted(buckets.items(), key=lambda item: item[0])
     ]
-
