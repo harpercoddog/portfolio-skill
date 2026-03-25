@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 
+from app.config import BASE_CURRENCY
 from app.services.portfolio import build_positions, summarize_by_account, summarize_positions
 from app.utils.money import quant_money, safe_divide, to_decimal
 
@@ -19,7 +20,7 @@ def analyze_portfolio(
 
     top_holdings = sorted(
         positions,
-        key=lambda item: item["market_value"] or to_decimal(0),
+        key=lambda item: item["market_value_base"] or to_decimal(0),
         reverse=True,
     )[:5]
     big_movers = sorted(
@@ -39,7 +40,7 @@ def analyze_portfolio(
                 f"{position['symbol']} 单日跌幅 {position['day_change_pct']:.2%}，超过阈值，建议复盘最近的基本面或消息面。"
             )
 
-        holding_weight = safe_divide(position["market_value"], total_market_value) if total_market_value > 0 else None
+        holding_weight = safe_divide(position["market_value_base"], total_market_value) if total_market_value > 0 else None
         if holding_weight is not None and holding_weight >= to_decimal(concentration_threshold):
             alerts.append(
                 f"{position['symbol']} 占组合市值 {holding_weight:.2%}，集中度偏高，建议关注单一标的风险。"
@@ -62,5 +63,5 @@ def analyze_portfolio(
         "positions": positions,
         "total_market_value": quant_money(total_market_value),
         "total_unrealized_pnl": quant_money(summary["total_unrealized_pnl"]),
+        "report_currency": BASE_CURRENCY,
     }
-

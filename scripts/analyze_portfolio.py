@@ -40,9 +40,10 @@ def main() -> None:
     summary = report["summary"]
     print("组合分析报告")
     print(f"- 数据库: {db_path}")
-    print(f"- 总市值: {format_decimal(summary['total_market_value'])}")
-    print(f"- 总浮盈浮亏: {format_decimal(summary['total_unrealized_pnl'])}")
-    print(f"- 总已实现收益: {format_decimal(summary['total_realized_pnl'])}")
+    print(f"- 汇总币种: {summary['report_currency']}")
+    print(f"- 总市值: {format_decimal(summary['total_market_value'])} {summary['report_currency']}")
+    print(f"- 总浮盈浮亏: {format_decimal(summary['total_unrealized_pnl'])} {summary['report_currency']}")
+    print(f"- 总已实现收益: {format_decimal(summary['total_realized_pnl'])} {summary['report_currency']}")
     print(f"- 总收益率: {format_percent(summary['total_return_rate'])}")
     print("账户分布:")
     for row in report["account_breakdown"]:
@@ -50,7 +51,8 @@ def main() -> None:
     print("前五大持仓:")
     for row in report["top_holdings"]:
         print(
-            f"- {row['symbol']} / {row['account_name']}: 市值 {format_decimal(row['market_value'])}，"
+            f"- {row['symbol']} / {row['account_name']}: 原币市值 {format_decimal(row['market_value'])} {row['currency']}，"
+            f"折合市值 {format_decimal(row['market_value_base'])} {summary['report_currency']}，"
             f"收益率 {format_percent(row['return_rate'])}"
         )
     print("当日波动较大的标的:")

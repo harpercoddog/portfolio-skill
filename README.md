@@ -227,7 +227,24 @@ python scripts/analyze_portfolio.py --db-path data/portfolio.db
 
 - 未实现收益 = (最新价格 - 平均成本) × 当前数量
 
-## 6. 规则型建议逻辑
+## 6. 汇率与汇总口径
+
+当前 skill 会把组合汇总统一换算成 `CNY` 后再展示，因此不会再把 `USD` 和 `CNY` 直接相加。
+
+当前口径：
+
+- 单个持仓行：保留原币种显示
+- 组合总市值、总盈亏、账户分布、前五大持仓排序：按 `CNY` 汇总
+
+MVP 使用静态汇率表：
+
+- `USD -> CNY = 7.20`
+- `HKD -> CNY = 0.92`
+- `CNY -> CNY = 1.00`
+
+后续可以再升级成实时汇率 provider。
+
+## 7. 规则型建议逻辑
 
 默认规则见 [references/rules.md](references/rules.md)：
 
@@ -236,7 +253,7 @@ python scripts/analyze_portfolio.py --db-path data/portfolio.db
 - 单标的浮盈浮亏超过阈值，提醒检查纪律
 - 缺少最新价格，提醒先同步行情
 
-## 7. 适配 OpenClaw / QQ Claw
+## 8. 适配 OpenClaw / QQ Claw
 
 `SKILL.md` 已定义：
 
@@ -248,7 +265,7 @@ python scripts/analyze_portfolio.py --db-path data/portfolio.db
 
 因此它既可以作为独立 GitHub 项目，也可以作为 Skill 根目录直接接入。
 
-## 8. 数据读写说明
+## 9. 数据读写说明
 
 所有脚本都会在输出中打印当前数据库路径，便于确认本次操作写到哪里。
 
@@ -259,7 +276,7 @@ python scripts/analyze_portfolio.py --db-path data/portfolio.db
 - `sync_prices`：读取活跃标的，写入 `price_history`，并更新 `assets.last_price`
 - `analyze_portfolio`：读取交易流水和最新价格，输出规则型分析
 
-## 9. MVP 边界
+## 10. MVP 边界
 
 当前版本刻意保持简单：
 

@@ -47,11 +47,12 @@ def main() -> None:
 
     print(f"查询范围: {scope}")
     print(f"数据库: {db_path}")
+    print(f"汇总币种: {summary['report_currency']}")
     print(f"持仓数量: {summary['position_count']}")
-    print(f"总成本: {format_decimal(summary['total_cost_basis'])}")
-    print(f"总市值: {format_decimal(summary['total_market_value'])}")
-    print(f"总浮盈浮亏: {format_decimal(summary['total_unrealized_pnl'])}")
-    print(f"总已实现收益: {format_decimal(summary['total_realized_pnl'])}")
+    print(f"总成本: {format_decimal(summary['total_cost_basis'])} {summary['report_currency']}")
+    print(f"总市值: {format_decimal(summary['total_market_value'])} {summary['report_currency']}")
+    print(f"总浮盈浮亏: {format_decimal(summary['total_unrealized_pnl'])} {summary['report_currency']}")
+    print(f"总已实现收益: {format_decimal(summary['total_realized_pnl'])} {summary['report_currency']}")
     print(f"总收益率: {format_percent(summary['total_return_rate'])}")
     print("持仓明细:")
     if not positions:

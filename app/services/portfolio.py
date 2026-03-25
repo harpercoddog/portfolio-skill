@@ -5,6 +5,7 @@ from collections import defaultdict
 from datetime import date
 
 from app.models import PositionState, TransactionType
+from app.services.fx import FxService
 from app.utils.money import quant_money, quant_qty, safe_divide, to_decimal
 
 
@@ -156,11 +157,16 @@ def build_positions(
                 "quantity": state.quantity,
                 "average_cost": state.average_cost,
                 "total_cost_basis": state.total_cost_basis,
+                "total_cost_basis_base": FxService.convert(state.total_cost_basis, sample["asset_currency"]),
                 "current_price": current_price,
                 "market_value": market_value,
+                "market_value_base": FxService.convert(market_value, sample["asset_currency"]),
                 "unrealized_pnl": unrealized_pnl,
+                "unrealized_pnl_base": FxService.convert(unrealized_pnl, sample["asset_currency"]),
                 "realized_pnl": state.realized_pnl,
+                "realized_pnl_base": FxService.convert(state.realized_pnl, sample["asset_currency"]),
                 "total_pnl": total_pnl,
+                "total_pnl_base": FxService.convert(total_pnl, sample["asset_currency"]),
                 "return_rate": return_rate,
                 "price_date": latest_price["price_date"] if latest_price else None,
                 "prev_close_price": prev_close_price,
@@ -173,14 +179,14 @@ def build_positions(
 
 
 def summarize_positions(positions: list[dict]) -> dict:
-    total_cost = quant_money(sum((item["total_cost_basis"] for item in positions), start=to_decimal(0)))
+    total_cost = quant_money(sum((item["total_cost_basis_base"] for item in positions), start=to_decimal(0)))
     total_market_value = quant_money(
-        sum((item["market_value"] or to_decimal(0) for item in positions), start=to_decimal(0))
+        sum((item["market_value_base"] or to_decimal(0) for item in positions), start=to_decimal(0))
     )
     total_unrealized = quant_money(
-        sum((item["unrealized_pnl"] or to_decimal(0) for item in positions), start=to_decimal(0))
+        sum((item["unrealized_pnl_base"] or to_decimal(0) for item in positions), start=to_decimal(0))
     )
-    total_realized = quant_money(sum((item["realized_pnl"] for item in positions), start=to_decimal(0)))
+    total_realized = quant_money(sum((item["realized_pnl_base"] for item in positions), start=to_decimal(0)))
     return {
         "position_count": len(positions),
         "total_cost_basis": total_cost,
@@ -188,6 +194,7 @@ def summarize_positions(positions: list[dict]) -> dict:
         "total_unrealized_pnl": total_unrealized,
         "total_realized_pnl": total_realized,
         "total_return_rate": safe_divide(total_unrealized + total_realized, total_cost),
+        "report_currency": "CNY",
     }
 
 
@@ -203,9 +210,9 @@ def summarize_by_account(positions: list[dict]) -> list[dict]:
                 "realized_pnl": to_decimal(0),
             },
         )
-        bucket["market_value"] += position["market_value"] or to_decimal(0)
-        bucket["unrealized_pnl"] += position["unrealized_pnl"] or to_decimal(0)
-        bucket["realized_pnl"] += position["realized_pnl"]
+        bucket["market_value"] += position["market_value_base"] or to_decimal(0)
+        bucket["unrealized_pnl"] += position["unrealized_pnl_base"] or to_decimal(0)
+        bucket["realized_pnl"] += position["realized_pnl_base"] or to_decimal(0)
 
     return [
         {
@@ -213,6 +220,7 @@ def summarize_by_account(positions: list[dict]) -> list[dict]:
             "market_value": quant_money(payload["market_value"]),
             "unrealized_pnl": quant_money(payload["unrealized_pnl"]),
             "realized_pnl": quant_money(payload["realized_pnl"]),
+            "report_currency": "CNY",
         }
         for account_name, payload in sorted(buckets.items(), key=lambda item: item[0])
     ]
