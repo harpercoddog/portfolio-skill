@@ -25,6 +25,7 @@
 
 ```bash
 python scripts/record_trade.py --text "<用户原始输入>"
+python scripts/record_trade.py --text "<用户原始输入>" --db-path data/portfolio.db
 ```
 
 ## 2. 查询持仓
@@ -44,6 +45,7 @@ python scripts/record_trade.py --text "<用户原始输入>"
 python scripts/query_portfolio.py
 python scripts/query_portfolio.py --account "美股账户"
 python scripts/query_portfolio.py --symbol "AAPL"
+python scripts/query_portfolio.py --db-path data/portfolio.db
 ```
 
 ## 3. 同步价格
@@ -58,7 +60,7 @@ python scripts/query_portfolio.py --symbol "AAPL"
 推荐调用：
 
 ```bash
-python scripts/sync_prices.py --provider mock
+python scripts/sync_prices.py --provider auto --db-path data/portfolio.db
 ```
 
 ## 4. 组合分析
@@ -73,6 +75,5 @@ python scripts/sync_prices.py --provider mock
 推荐调用：
 
 ```bash
-python scripts/analyze_portfolio.py
+python scripts/analyze_portfolio.py --db-path data/portfolio.db
 ```
-

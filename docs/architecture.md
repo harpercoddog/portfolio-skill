@@ -14,7 +14,7 @@
 - 只做本地单机版
 - 只用 Python 标准库 + SQLite
 - 仓位完全由 `transactions` 推导，不把 `positions` 当成唯一真相源
-- 价格源先做 provider abstraction，默认接 `mock`
+- 价格源先做 provider abstraction，默认接 `auto`
 - 建议逻辑先做规则型，不让模型自由发挥
 
 ## 3. 模块划分
@@ -47,6 +47,7 @@
 - 调用价格 provider
 - 写入 `price_history`
 - 更新 `assets.last_price`
+- `auto` 模式下按市场路由真实数据源
 
 ### `app/services/analytics.py`
 
@@ -57,8 +58,10 @@
 ### `app/providers/*`
 
 - `base.py`：统一接口
-- `mock_provider.py`：可运行的默认价格源
-- `yahoo_provider.py` / `akshare_provider.py`：预留扩展点
+- `mock_provider.py`：离线演示价格源
+- `yahoo_provider.py`：美股 / 港股真实价格源
+- `akshare_provider.py`：A 股 / ETF 真实价格源
+- `auto_provider.py`：按市场自动路由
 
 ## 4. 成本与收益规则
 
@@ -107,4 +110,3 @@
 - 加入多币种汇率换算
 - 增加现金流水与资金账户
 - 增加测试集和更多自然语言表达式
-

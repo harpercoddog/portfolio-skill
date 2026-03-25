@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 
 from app.db import bootstrap_database
 from app.services.analytics import analyze_portfolio
+from app.utils.cli import resolve_db_path
 from app.utils.formatting import render_account_line
 from app.utils.money import format_decimal, format_percent
 
@@ -20,12 +21,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--drop-threshold", type=float, default=0.05, help="单日跌幅提醒阈值，默认 0.05")
     parser.add_argument("--concentration-threshold", type=float, default=0.35, help="单一标的集中度阈值，默认 0.35")
     parser.add_argument("--pnl-threshold", type=float, default=0.20, help="浮盈浮亏提醒阈值，默认 0.20")
+    parser.add_argument("--db-path", help="SQLite 数据库路径，默认 data/portfolio.db 或环境变量 PORTFOLIO_DB_PATH")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    conn = bootstrap_database()
+    db_path = resolve_db_path(args.db_path)
+    conn = bootstrap_database(db_path=db_path)
     report = analyze_portfolio(
         conn=conn,
         drop_threshold=args.drop_threshold,
@@ -36,6 +39,7 @@ def main() -> None:
 
     summary = report["summary"]
     print("组合分析报告")
+    print(f"- 数据库: {db_path}")
     print(f"- 总市值: {format_decimal(summary['total_market_value'])}")
     print(f"- 总浮盈浮亏: {format_decimal(summary['total_unrealized_pnl'])}")
     print(f"- 总已实现收益: {format_decimal(summary['total_realized_pnl'])}")
